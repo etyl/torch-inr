@@ -119,7 +119,7 @@ class NoiseEncoding(PositionalEncoder):
         output_dim: int,
         n_layers: int = 3,
         sampler: Optional[Sampler] = None,
-        backbone = None,
+        backbone=None,
         weights_path: Optional[str] = None,
         cache_dir: str = "weights",
         pretrain_kwargs: Optional[dict] = None,
@@ -139,7 +139,9 @@ class NoiseEncoding(PositionalEncoder):
         if weights_path is not None:
             self._load(weights_path)
         elif sampler is not None:
-            cache_path = os.path.join(cache_dir, f"noise_encoding_{self._cache_key()}.pth")
+            cache_path = os.path.join(
+                cache_dir, f"noise_encoding_{self._cache_key()}.pth"
+            )
             if os.path.exists(cache_path):
                 self._load(cache_path)
                 self.backbone.to(sampler.X.device)
@@ -153,7 +155,9 @@ class NoiseEncoding(PositionalEncoder):
                     **(pretrain_kwargs or {}),
                 )
         else:
-            raise ValueError("Either `sampler` or `weights_path` must be provided for NoiseEncoding.")
+            raise ValueError(
+                "Either `sampler` or `weights_path` must be provided for NoiseEncoding."
+            )
 
     def _cache_key(self) -> str:
         """Cache key from the backbone hyperparameters: layer type, width, depth, input dim."""
@@ -162,7 +166,9 @@ class NoiseEncoding(PositionalEncoder):
         return f"{layer_type}_in{self.input_dim}_w{self._output_dim}_d{len(layers)}"
 
     def _load(self, path: str) -> None:
-        self.backbone.load_state_dict(torch.load(path, map_location="cpu", weights_only=True))
+        self.backbone.load_state_dict(
+            torch.load(path, map_location="cpu", weights_only=True)
+        )
         self.backbone.eval()
 
     def _pretrain(
@@ -185,11 +191,20 @@ class NoiseEncoding(PositionalEncoder):
         out_shape = [data_shape[k] for k in predict_dims] or [1]
         targets = 2 * torch.rand((n_decoders, *data_shape), device=device) - 1
         samplers = [
-            UniformSampler(t, batch_size=max(batch_size // n_decoders, 1), predict_dims=predict_dims)
+            UniformSampler(
+                t,
+                batch_size=max(batch_size // n_decoders, 1),
+                predict_dims=predict_dims,
+            )
             for t in targets
         ]
-        decoders = [nn.Linear(self._output_dim, prod(out_shape)).to(device) for _ in range(n_decoders)]
-        params = list(self.backbone.parameters()) + [p for d in decoders for p in d.parameters()]
+        decoders = [
+            nn.Linear(self._output_dim, prod(out_shape)).to(device)
+            for _ in range(n_decoders)
+        ]
+        params = list(self.backbone.parameters()) + [
+            p for d in decoders for p in d.parameters()
+        ]
         optimizer = torch.optim.Adam(params, lr=lr)
         for _ in tqdm(range(n_steps), desc="Pretraining NoiseEncoding", unit="step"):
             loss = torch.zeros((), device=device)

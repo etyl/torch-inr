@@ -21,3 +21,10 @@ Homepage = "https://github.com/etyl/nf-compression"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+select = ["E", "F"]

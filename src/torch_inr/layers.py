@@ -5,7 +5,9 @@ from torch import Tensor, nn
 from torch.nn import init
 
 
-def _init_weights(linear: nn.Linear, omega: float = 1.0, is_first: bool = False) -> None:
+def _init_weights(
+    linear: nn.Linear, omega: float = 1.0, is_first: bool = False
+) -> None:
     if hasattr(linear, "weight"):
         features_in = linear.weight.size(-1)
         if is_first:
@@ -15,8 +17,15 @@ def _init_weights(linear: nn.Linear, omega: float = 1.0, is_first: bool = False)
         init.uniform_(linear.weight, -bound, bound)
 
 
-def _init_bias(linear: nn.Linear, fbs: float | None = None, is_first: bool = True) -> None:
-    if is_first and fbs is not None and hasattr(linear, "bias") and linear.bias is not None:
+def _init_bias(
+    linear: nn.Linear, fbs: float | None = None, is_first: bool = True
+) -> None:
+    if (
+        is_first
+        and fbs is not None
+        and hasattr(linear, "bias")
+        and linear.bias is not None
+    ):
         init.uniform_(linear.bias, -fbs, fbs)
 
 

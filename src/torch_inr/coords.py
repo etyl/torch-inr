@@ -5,7 +5,9 @@ import torch
 from torch import Tensor
 
 
-def get_coords(shape: Sequence[int], predict_dims: Sequence[int] | None = None) -> Tensor:
+def get_coords(
+    shape: Sequence[int], predict_dims: Sequence[int] | None = None
+) -> Tensor:
     """Build a cartesian grid of coordinates normalized to [-1, 1].
 
     Dimensions listed in ``predict_dims`` are excluded from the grid (they are
@@ -14,7 +16,9 @@ def get_coords(shape: Sequence[int], predict_dims: Sequence[int] | None = None) 
     if predict_dims is None:
         predict_dims = []
     input_shape = [shape[k] for k in range(len(shape)) if k not in predict_dims]
-    coords = torch.cartesian_prod(*[2 * torch.arange(s).to(torch.float32) / s - 1 for s in input_shape])
+    coords = torch.cartesian_prod(
+        *[2 * torch.arange(s).to(torch.float32) / s - 1 for s in input_shape]
+    )
     if coords.dim() == 1:
         coords = coords.unsqueeze(1)
     return coords

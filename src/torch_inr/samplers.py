@@ -37,18 +37,26 @@ class UniformSampler(Sampler):
         self.device = X.device
         self.X_target = get_target(X, self.predict_dims)
 
-        self._input_shape_tensor = torch.tensor(self.input_shape, device=self.device, dtype=torch.float32).unsqueeze(0)
+        self._input_shape_tensor = torch.tensor(
+            self.input_shape, device=self.device, dtype=torch.float32
+        ).unsqueeze(0)
         self._multipliers = torch.tensor(
-            [prod(self.input_shape[i + 1:]) for i in range(len(self.input_shape))],
+            [prod(self.input_shape[i + 1 :]) for i in range(len(self.input_shape))],
             device=self.device,
             dtype=torch.long,
         )
 
     @torch.no_grad()
     def sample(self) -> Tensor:
-        self.idx = torch.empty((self.batch_size, len(self.input_shape)), dtype=torch.long, device=self.device)
+        self.idx = torch.empty(
+            (self.batch_size, len(self.input_shape)),
+            dtype=torch.long,
+            device=self.device,
+        )
         for i, dim in enumerate(self.input_shape):
-            self.idx[:, i] = torch.randint(0, dim, (self.batch_size,), device=self.device)
+            self.idx[:, i] = torch.randint(
+                0, dim, (self.batch_size,), device=self.device
+            )
 
         self.coords = self.idx / self._input_shape_tensor
         self.coords = self.coords * 2 - 1
@@ -86,7 +94,9 @@ class LMCSampler(Sampler):
         self.soft_mining = soft_mining
 
         self.grad_q = None
-        self.coords = torch.rand((self.batch_size, len(self.shape)), device=self.device) * 2 - 1
+        self.coords = (
+            torch.rand((self.batch_size, len(self.shape)), device=self.device) * 2 - 1
+        )
 
     def sample(self) -> Tensor:
         if self.grad_q is None:
@@ -105,7 +115,11 @@ class LMCSampler(Sampler):
         return self.coords
 
     def compute_loss(self, X_pred: Tensor) -> Tensor:
-        coords_int = ((self.coords + 1) * torch.tensor(self.shape, device=X_pred.device) / 2).floor().long()
+        coords_int = (
+            ((self.coords + 1) * torch.tensor(self.shape, device=X_pred.device) / 2)
+            .floor()
+            .long()
+        )
         coords_int = coords_int.clamp_min(0)
         for i in range(len(self.shape)):
             coords_int[:, i] = coords_int[:, i].clamp_max(self.shape[i] - 1)
@@ -114,9 +128,11 @@ class LMCSampler(Sampler):
         diff = X_pred.float() - target.float()
 
         log_q = torch.log(diff.abs().clamp_min(1e-4))
-        self.grad_q = torch.autograd.grad(log_q.sum(), self.coords, retain_graph=True)[0]
+        self.grad_q = torch.autograd.grad(log_q.sum(), self.coords, retain_graph=True)[
+            0
+        ]
 
-        dist = diff ** 2
+        dist = diff**2
 
         if self.soft_mining:
             with torch.no_grad():
