@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "torch-inr"
+version = "0.1.0"
+description = "Implicit Neural Representation components for PyTorch."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "torch-INR contributors"}]
+dependencies = ["torch", "tqdm"]
+
+[project.optional-dependencies]
+hashgrid = ["tinycudann"]
+dev = ["pytest"]
+
+[project.urls]
+Homepage = "https://github.com/etyl/nf-compression"
+
+[tool.setuptools.packages.find]
+where = ["src"]
