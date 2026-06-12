@@ -33,7 +33,9 @@ def get_output_dim(shape: Sequence[int], predict_dims: Sequence[int]) -> int:
 
 
 def get_target(X: Tensor, predict_dims: Sequence[int]) -> Tensor:
-    """Reorder and flatten ``X`` so it matches the coordinate order of ``get_coords``."""
+    """
+    Reorder and flatten ``X`` so it matches the coordinate order of ``get_coords``.
+    """
     shape = X.shape
     input_dims = [k for k in range(len(shape)) if k not in predict_dims]
     X_target = X.permute(*(input_dims + list(predict_dims)))

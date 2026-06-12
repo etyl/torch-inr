@@ -25,7 +25,9 @@ GRID = 16
 def make_target(n: int = GRID, freq: float = 1.0) -> torch.Tensor:
     """Smooth low-frequency 2D signal in [-1, 1]."""
     coords = get_coords((n, n))
-    vals = torch.sin(freq * math.pi * coords[:, 0]) * torch.cos(freq * math.pi * coords[:, 1])
+    vals = torch.sin(freq * math.pi * coords[:, 0]) * torch.cos(
+        freq * math.pi * coords[:, 1]
+    )
     return vals.reshape(n, n)
 
 
@@ -80,6 +82,7 @@ CONVERGED_MSE = 1e-3
 # Layers: SIREN and FINER networks fit the signal with full-grid training.
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.parametrize("make_model", [make_siren, make_finer], ids=["siren", "finer"])
 def test_layer_network_converges(make_model):
     torch.manual_seed(0)
@@ -92,6 +95,7 @@ def test_layer_network_converges(make_model):
 # ---------------------------------------------------------------------------
 # Encoders: encoder + ReLU MLP fits the signal.
 # ---------------------------------------------------------------------------
+
 
 def test_fourier_encoding_converges():
     torch.manual_seed(0)
@@ -106,7 +110,9 @@ def test_fourier_encoding_converges():
 def test_fourier_gauss_encoding_converges():
     torch.manual_seed(0)
     X = make_target()
-    model = make_relu_mlp(FourierGaussEncoding(input_dim=2, num_frequencies=64, sigma=3.0))
+    model = make_relu_mlp(
+        FourierGaussEncoding(input_dim=2, num_frequencies=64, sigma=3.0)
+    )
     fit(model, GDSampler(X), lr=5e-3)
     assert full_grid_mse(model, X) < CONVERGED_MSE
 
@@ -143,6 +149,7 @@ def test_hashgrid_encoding_converges():
 # ---------------------------------------------------------------------------
 # Samplers: each sampling strategy trains a SIREN to convergence.
 # ---------------------------------------------------------------------------
+
 
 def test_uniform_sampler_converges():
     torch.manual_seed(0)
@@ -189,12 +196,17 @@ def test_gd_sampler_loss_decreases_monotonically_overall():
 # Multi-channel target via predict_dims (e.g. RGB image).
 # ---------------------------------------------------------------------------
 
+
 def test_multichannel_convergence_predict_dims():
     torch.manual_seed(0)
     n, channels = GRID, 3
     coords = get_coords((n, n))
     X = torch.stack(
-        [torch.sin(math.pi * (c + 1) * coords[:, 0] / 2) * torch.cos(math.pi * coords[:, 1]) for c in range(channels)],
+        [
+            torch.sin(math.pi * (c + 1) * coords[:, 0] / 2)
+            * torch.cos(math.pi * coords[:, 1])
+            for c in range(channels)
+        ],
         dim=-1,
     ).reshape(n, n, channels)
 
