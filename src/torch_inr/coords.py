@@ -15,7 +15,7 @@ def get_coords(
     """
     if predict_dims is None:
         predict_dims = []
-    input_shape = [shape[k] for k in range(len(shape)) if k not in predict_dims]
+    input_shape = get_input_shape(shape, predict_dims)
     coords = torch.cartesian_prod(
         *[2 * torch.arange(s).to(torch.float32) / s - 1 for s in input_shape]
     )
