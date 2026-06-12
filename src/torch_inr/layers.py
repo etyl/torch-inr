@@ -62,7 +62,9 @@ def _finer_activation(x: Tensor, omega: float) -> Tensor:
 
 
 class FinerLayer(nn.Module):
-    """FINER layer (variable-periodic sine) with first-layer bias init in [-fbs, fbs]."""
+    """
+    FINER layer (variable-periodic sine) with first-layer bias init in [-fbs, fbs].
+    """
 
     def __init__(
         self,

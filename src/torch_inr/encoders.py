@@ -38,7 +38,9 @@ class FourierEncoding(PositionalEncoder):
 
 
 class FourierGaussEncoding(PositionalEncoder):
-    """Random Fourier features with a Gaussian projection matrix (Tancik et al., 2020)."""
+    """
+    Random Fourier features with a Gaussian projection matrix (Tancik et al., 2020).
+    """
 
     def __init__(self, input_dim: int, num_frequencies: int, sigma: float):
         super().__init__()
@@ -57,7 +59,9 @@ class FourierGaussEncoding(PositionalEncoder):
 
 
 class HashGridEncoding(PositionalEncoder):
-    """Multi-resolution hash grid encoding backed by tinycudann (requires CUDA)."""
+    """
+    Multi-resolution hash grid encoding backed by tinycudann (requires CUDA).
+    """
 
     def __init__(
         self,
@@ -160,7 +164,10 @@ class NoiseEncoding(PositionalEncoder):
             )
 
     def _cache_key(self) -> str:
-        """Cache key from the backbone hyperparameters: layer type, width, depth, input dim."""
+        """
+        Cache key from the backbone hyperparameters: layer type, width, depth, input
+        dim.
+        """
         layers = list(self.backbone.children()) or [self.backbone]
         layer_type = type(layers[0]).__name__
         return f"{layer_type}_in{self.input_dim}_w{self._output_dim}_d{len(layers)}"
