@@ -23,6 +23,10 @@ class Sampler(ABC):
     def compute_loss(self, X_pred: Tensor) -> Tensor:
         pass
 
+    @abstractmethod
+    def to(self, device: torch.device) -> "Sampler":
+        pass
+
 
 class UniformSampler(Sampler):
     """Uniform random sampling of grid coordinates."""
@@ -68,6 +72,14 @@ class UniformSampler(Sampler):
 
         dist = (X_pred - target) ** 2
         return dist.mean()
+
+    def to(self, device: torch.device) -> "UniformSampler":
+        self.device = device
+        self.X = self.X.to(device)
+        self.X_target = self.X_target.to(device)
+        self._input_shape_tensor = self._input_shape_tensor.to(device)
+        self._multipliers = self._multipliers.to(device)
+        return self
 
 
 class LMCSampler(Sampler):
@@ -142,6 +154,14 @@ class LMCSampler(Sampler):
 
         return dist.mean()
 
+    def to(self, device: torch.device) -> "LMCSampler":
+        self.device = device
+        self.X = self.X.to(device)
+        if self.grad_q is not None:
+            self.grad_q = self.grad_q.to(device)
+        self.coords = self.coords.to(device)
+        return self
+
 
 class GDSampler(Sampler):
     """Deterministic full-grid sampler: every coordinate, every iteration."""
@@ -162,3 +182,10 @@ class GDSampler(Sampler):
     def compute_loss(self, X_pred: Tensor) -> Tensor:
         dist = (X_pred - self.X_target) ** 2
         return dist.mean()
+
+    def to(self, device: torch.device) -> "GDSampler":
+        self.device = device
+        self.X = self.X.to(device)
+        self.X_target = self.X_target.to(device)
+        self.coords = self.coords.to(device)
+        return self
